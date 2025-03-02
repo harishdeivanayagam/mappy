@@ -1,6 +1,6 @@
 import { OpenAI } from "openai"
 
-export async function map(input: any, outputFormat: any) {
+export async function autoMap(input: any, outputFormat: any, useCache: boolean = true) {
 
     const openai = new OpenAI({
         apiKey: process.env.OPENAI_API_KEY,

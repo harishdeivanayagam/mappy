@@ -2,9 +2,9 @@ endpoints:
   # Read contacts from the CRM
   - name: read_contacts
     description: Read contacts from Attio
-    input_json_format: {
+    input_json_format: '{
       limit: number
-    }
+    }'
     tools:
       # Read people from Attio
       - name: attio
@@ -23,9 +23,9 @@ endpoints:
           limit: number
         }
 
-    output_json_format: {
+    output_json_format: '{
       contacts: Array<{
         id: string,
         name: string
       }>
-    }
+    }'

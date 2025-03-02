@@ -1,0 +1,205 @@
+{
+	"info": {
+		"_postman_id": "e1f81055-a65a-4e42-b311-c0a40f949e37",
+		"name": "Mappy",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Ouath URL",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "x-owner-id",
+						"value": "{{x-org-id}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{endpoint}}/tools/oauth/attio",
+					"host": [
+						"{{endpoint}}"
+					],
+					"path": [
+						"tools",
+						"oauth",
+						"attio"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Oauth Complete",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "x-owner-id",
+						"value": "{{x-org-id}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"code\":\"eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IjEifQ.eyJpYXQiOjE3NDA5MDAwODAsImV4cCI6MTc0MDkwMDM4MCwiYXVkIjoiaHR0cHM6Ly9hcHAuYXR0aW8uY29tIiwiaXNzIjoiaHR0cHM6Ly9hcHAuYXR0aW8uY29tIiwiZ3JhbnRpbmdfd29ya3NwYWNlX2lkIjoiZDE2YTE4NDQtNzVlZC00NTNhLWFjMmYtOGFjMmM5MzMyNjhmIiwiY2xpZW50X2lkIjoiMjE3NWJjZTQtNDc4NC00ZDAxLWEwY2MtZGEyY2M4NTQ4YjAxIiwiand0X2lkIjoiZmJkNTRlNGEtNjA3Ny00ODk0LWE2N2MtOWJiNDU4YTRmODg1Iiwic2NvcGVzIjpbInJlY29yZF9wZXJtaXNzaW9uOnJlYWQtd3JpdGUiLCJsaXN0X2VudHJ5OnJlYWQtd3JpdGUiLCJvYmplY3RfY29uZmlndXJhdGlvbjpyZWFkLXdyaXRlIl0sInN0YXRlIjoiIiwiZ3JhbnRpbmdfYWN0b3JfaWQiOiJiMjQwZmI1Zi04NjRmLTRmYmYtODNmNS1mZjViMTdkNzY3MWUiLCJncmFudGluZ19hY3Rvcl90eXBlIjoid29ya3NwYWNlLW1lbWJlciJ9.uM1DBdnJcTo-1Gm0Im0bMsqHJxJAeQJrQxqdTtRL3l3OFl7TQhF8evu2ItbixNGjhQgaAJ017fpW2sBFiADNVA\",\"name\":\"attio\"}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{endpoint}}/tools/oauth/complete",
+					"host": [
+						"{{endpoint}}"
+					],
+					"path": [
+						"tools",
+						"oauth",
+						"complete"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Tools",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "x-owner-id",
+						"value": "{{x-org-id}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{endpoint}}/tools",
+					"host": [
+						"{{endpoint}}"
+					],
+					"path": [
+						"tools"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete Integration",
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "x-owner-id",
+						"value": "{{x-org-id}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{endpoint}}/tools/attio",
+					"host": [
+						"{{endpoint}}"
+					],
+					"path": [
+						"tools",
+						"attio"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Add Apikey",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"name\": \"instantly\",\r\n    \"apikey\": \"your-api-key\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{endpoint}}/tools/apikey",
+					"host": [
+						"{{endpoint}}"
+					],
+					"path": [
+						"tools",
+						"apikey"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Endpoints",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "x-owner-id",
+						"value": "{{x-org-id}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{endpoint}}/endpoints",
+					"host": [
+						"{{endpoint}}"
+					],
+					"path": [
+						"endpoints"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "d4kcZXwYlpTDzwWQ5pp4E7GD9W6muuWy",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "x-org-id",
+			"value": "testorg"
+		},
+		{
+			"key": "endpoint",
+			"value": "http://localhost:3005/api"
+		}
+	]
+}
