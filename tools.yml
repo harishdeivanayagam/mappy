@@ -1,0 +1,21 @@
+tools:
+  - name: attio
+    auth: oauth2
+    auth_info:
+      client_id: 2175bce4-4784-4d01-a0cc-da2cc8548b01
+      client_secret: 8969bb9ed8f54c932c11e996213baa4fbce1f1427bf8a68840fbdf740b11ca43
+      redirect_uri: https://62b3-2405-201-e01d-903b-4d63-b5dc-3841-8dde.ngrok-free.app/api/tools/oauth/attio/callback
+      scopes:
+        - object_configuration:read
+        - record_permission:read-write
+
+  - name: hubspot
+    auth: oauth2
+    auth_info:
+      client_id: c1095c9a-7e02-440c-adea-4fbc300be8b9
+      client_secret: be356b7b-11c7-48e0-8e85-8f2e15d1964e
+      redirect_uri: https://62b3-2405-201-e01d-903b-4d63-b5dc-3841-8dde.ngrok-free.app/api/tools/oauth/hubspot/callback
+      app_id: 8803742
+      scopes:
+        - crm.objects.contacts.read
+        - crm.objects.contacts.write

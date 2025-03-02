@@ -1,0 +1,31 @@
+endpoints:
+  # Read contacts from the CRM
+  - name: read_contacts
+    description: Read contacts from Attio
+    input_json_format: {
+      limit: number
+    }
+    tools:
+      # Read people from Attio
+      - name: attio
+        url: https://api.attio.com/v2/objects/object/records/query
+        method: POST
+        body: {
+          limit: number
+        }
+
+
+      # Read contacts from Hubspot
+      - name: hubspot
+        url: https://api.hubapi.com/crm/v3/objects/contacts
+        method: POST
+        query_params: {
+          limit: number
+        }
+
+    output_json_format: {
+      contacts: Array<{
+        id: string,
+        name: string
+      }>
+    }
