@@ -1,31 +1,59 @@
 endpoints:
   # Read contacts from the CRM
   - name: read_contacts
-    description: Read contacts from Attio
-    input_json_format: '{
-      limit: number
-    }'
+    description: Read contacts from CRM
+    input_json_format: |
+      {
+        "type": "object",
+        "properties": {
+          "limit": {
+            "type": "number",
+            "description": "The number of contacts to read"
+          }
+        },
+        "required": ["limit"]
+      }
     tools:
       # Read people from Attio
       - name: attio
-        url: https://api.attio.com/v2/objects/object/records/query
+        url: https://api.attio.com/v2/objects/people/records/query
         method: POST
-        body: {
-          limit: number
-        }
-
+        headers: |
+          {
+            "Authorization": "Bearer {{ secret }}"
+          }
+        body: |
+          {
+            "limit": "number"
+          }
 
       # Read contacts from Hubspot
       - name: hubspot
         url: https://api.hubapi.com/crm/v3/objects/contacts
         method: POST
-        query_params: {
-          limit: number
-        }
+        headers: |
+          {
+            "Authorization": "Bearer {{ secret }}"
+          }
+        query_params: |
+          {
+            "limit": "number"
+          }
 
-    output_json_format: '{
-      contacts: Array<{
-        id: string,
-        name: string
-      }>
-    }'
+    output_json_format: |
+      {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "description": "The ID of the contact"
+            },
+            "name": {
+              "type": "string",
+              "description": "The name of the contact"
+            }
+          }
+        }
+      }

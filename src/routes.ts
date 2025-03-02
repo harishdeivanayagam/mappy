@@ -5,6 +5,9 @@ import { prisma } from "./prisma"
 import yaml from "js-yaml"
 import fs from "fs"
 import axios from "axios"
+import { Tool } from "@prisma/client"
+import { autoMap } from "./mapper"
+import { validate } from "jsonschema"
 
 const router = Router()
 
@@ -39,6 +42,37 @@ router.get(
             return
         } catch (error) {
             res.status(500).json({ error: "Failed to read tools configuration" })
+            return
+        }
+    }
+)
+
+router.get(
+    "/tools/:name",
+    validateRequest({
+        params: z.object({
+            name: z.string()
+        })
+    }),
+    async (req, res) => {
+        try {
+            const { name } = req.params
+            const tool = await prisma.tool.findFirst({
+                where: {
+                    name: name,
+                    ownerId: res.locals.ownerId
+                }
+            })
+
+            if (!tool) {
+                res.status(404).json({ error: "Tool not found" })
+                return
+            }
+
+            res.json(tool)
+            return
+        } catch (error) {
+            res.status(500).json({ error: "Failed to read tool" })
             return
         }
     }
@@ -240,47 +274,75 @@ router.get(
 
 router.post(
     "/endpoints/:name",
-    validateRequest({
-        body: z.any()
-    }),
     async (req, res) => {
         try {
             const { name } = req.params
-            const endpoints = readYamlFile("endpoints.yml")
-            const endpoint = endpoints[name]
+            const endpointsFile = readYamlFile("endpoints.yml")
+            const endpoint = endpointsFile.endpoints.find((endpoint: any) => endpoint.name === name)
 
             if (!endpoint) {
                 res.status(404).json({ error: "Endpoint not found" })
                 return
             }
 
-            // Validate input format
-            const inputSchema = z.any() // This should be derived from endpoint.inputFormat
-            const validatedInput = inputSchema.parse(req.body)
 
-            // Get tool authentication
-            const toolAuth = await prisma.tool.findFirstOrThrow({
-                where: {
-                    name: endpoint.tool,
-                    ownerId: res.locals.ownerId
-                }
-            })
-
-            if (!toolAuth) {
-                res.status(401).json({ error: "Tool not authenticated" })
+            if (endpoint.input_json_format && !validate(req.body, JSON.parse(endpoint.input_json_format)).valid) {
+                res.status(400).json({ error: "Invalid input data" })
                 return
             }
 
-            // Execute the endpoint logic
-            // This would typically involve calling the external tool"s API
-            // using the stored authentication and mapping the response
+            const availableTools = endpoint.tools.map((tool: any) => tool.name)
 
-            res.json({
-                status: "success",
-                // Add processed result here
+            let tool: Tool | null = null
+
+            for (const toolName of availableTools) {
+                tool = await prisma.tool.findFirst({
+                    where: {
+                        name: toolName,
+                        ownerId: res.locals.ownerId
+                    }
+                })
+                if (tool) {
+                    break
+                }
+            }
+
+            if (!tool) {
+                res.status(404).json({ error: "No tool found" })
+                return
+            }
+
+            // Find the tool in the endpoint <-> tool mapping [Ex: Hubspot -> User Hubspot]
+            const endpointTool = endpoint.tools.find((tool: any) => tool.name === tool.name)
+
+            // Set Token in headers
+            const headersJSON = JSON.parse(endpointTool.headers.replace("{{ secret }}", tool.secret))
+
+            // Map the body to the endpoint tool body
+            const bodyJSON = endpointTool.body ? await autoMap(req.body, JSON.parse(endpointTool.body)) : {}
+
+            // Map the query params to the endpoint tool query params
+            const queryParamsJSON = endpointTool.query_params ? await autoMap(req.body, JSON.parse(endpointTool.query_params)) : {}
+
+
+            console.log(bodyJSON)
+            console.log(queryParamsJSON)
+
+            // Make the request
+            const response = await axios({
+                method: endpointTool.method.toLowerCase(),
+                url: endpointTool.url,
+                headers: headersJSON,
+                data: bodyJSON,
+                params: queryParamsJSON
             })
+
+            // Map the response to the endpoint output format
+            const outputJSON = await autoMap(response.data, JSON.parse(endpoint.output_json_format))
+            res.json(outputJSON)
             return
         } catch (error) {
+            console.log(error)
             res.status(500).json({ error: "Failed to process endpoint request" })
             return
         }
