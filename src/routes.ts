@@ -280,6 +280,86 @@ router.post(
     }
 )
 
+
+router.get(
+    "/tools/:name/webhooks",
+    async (req, res) => {
+        try {
+            const { name } = req.params
+            const webhooks = await prisma.webhook.findMany({
+                where: {
+                    toolName: name,
+                    ownerId: res.locals.ownerId
+                }
+            })
+            res.json(webhooks)
+            return
+        } catch (error) {
+            res.status(500).json({ error: "Failed to read webhooks" })
+            return
+        }
+    }
+)
+
+router.post(
+    "/tools/:name/webhooks",
+    validateRequest({
+        params: z.object({
+            name: z.string()
+        }),
+        body: z.object({
+            id: z.string(),
+            event: z.string(),
+            secret: z.string().optional()
+        })
+    }),
+    async (req, res) => {
+        try {
+            const { id, event, secret } = req.body
+            const { name } = req.params
+
+            const existingWebhook = await prisma.webhook.findFirst({
+                where: {
+                    toolName: name,
+                    ownerId: res.locals.ownerId
+                }
+            })
+
+            if (existingWebhook) {
+                await prisma.webhook.update({
+                    where: {
+                        toolName_ownerId_event: {
+                            toolName: name,
+                            ownerId: res.locals.ownerId,
+                            event: event
+                        }
+                    },
+                    data: {
+                        webhookId: id,
+                        secret: secret
+                    }
+                })
+            } else {
+                await prisma.webhook.create({
+                    data: {
+                        toolName: name,
+                        ownerId: res.locals.ownerId,
+                        event: event,
+                        webhookId: id,
+                        secret: secret
+                    }
+                })
+            }
+
+            res.json({ success: true })
+            return
+        } catch (error) {
+            res.status(500).json({ error: "Failed to create webhook" })
+            return
+        }
+    }
+)
+
 router.get(
     "/endpoints",
     async (_, res) => {

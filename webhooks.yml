@@ -1,0 +1,18 @@
+webhooks:
+  - name: attio
+    forward_to: http://localhost:3000/api/webhooks/contact_created
+    events:
+      - name: contact_created
+        payload_json_format: |
+          {
+            "webhook_id": actor.id
+          }
+  - name: hubspot
+    events:
+      - name: contact_created
+        forward_to: http://localhost:3000/api/webhooks/contact_created
+        payload_json_format: |
+        {
+          "owner": portalId,
+          "webhook_id": subscriptionId
+        }

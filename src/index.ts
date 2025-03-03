@@ -1,6 +1,7 @@
 import express from "express"
 import { config } from "dotenv"
 import routes from "./routes"
+import webhooks from "./webhooks"
 
 config()
 
@@ -13,6 +14,8 @@ async function main() {
     app.get("/tools/oauth/:name/callback", (req, res) => {
         res.json({ code: req.query.code, name: req.params.name })
     })
+
+    app.use("/api/webhooks", webhooks)
 
     // Auth Middleware
     app.use((req, res, next) => {

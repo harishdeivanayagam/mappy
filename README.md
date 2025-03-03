@@ -2,16 +2,21 @@
 
 Mappy is an intelligent unified API generator that simplifies the process of building customer-facing native integrations. It provides a seamless way to integrate with multiple platforms (like CRM, HRMS, etc) through a single, unified API interface.
 
+
 ## 🌟 Features
 
 - **Unified API Interface**: Write once, integrate with multiple platforms
 - **AI-Powered ETL**: Automatic mapping and transformation of data between different platforms (Using API `/mappings` endpoint)
 - **Simple Configuration**: Easy to set up new integrations using YAML configuration
 - **OAuth2 Support**: Secure authentication with various platforms
-- **Webhook Support**: Receive and process webhooks from platforms (Coming Soon)
+- **Webhook Support**: Receive and process webhooks from platforms
 - **Extensible**: Easy to add new integrations and endpoints
 
-## 🚀 Prebuilt Platforms
+
+**Refer postman collection `Mappy.postman_collection.json` for API endpoint documentation**
+
+
+## 🚀 Prebuilt Integrations
 prebuilt tools.yml (coming soon)
 prebuilt endpoints.yml (coming soon)
 
@@ -64,7 +69,8 @@ npm install
 
 3. Configure your `tools.yml` with platform credentials
 4. Define your endpoints in `endpoints.yml`
-5. Start the server
+5. Define your webhooks in `webhooks.yml`
+6. Start the server
 
 ```bash
 npm start
@@ -91,16 +97,6 @@ curl -X POST http://your-api/read_contacts \
 }
 ```
 
-## 🤖 AI-Powered ETL
-
-Mappy uses advanced AI to automatically:
-- Map fields between different platforms
-- Transform data formats
-- Handle platform-specific requirements
-- Normalize responses
-
-This eliminates the need for manual ETL mapping and reduces integration complexity.
-
 ## 🛠️ Technical Stack
 
 - Node.js
@@ -108,6 +104,7 @@ This eliminates the need for manual ETL mapping and reduces integration complexi
 - OpenAI
 - YAML Configuration
 - OAuth2 Authentication
+- Jsonata for JSON transformations `/mappings` endpoint for AI powered automated transformation
 
 ## 🤝 Contributing
 
@@ -120,6 +117,9 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## 📫 Contact
 
 For questions and support, please open an issue in the GitHub repository.
+
+
+**Note: This is a work in progress and the project is not ready for production use.**
 
 ---
 

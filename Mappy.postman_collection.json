@@ -17,14 +17,14 @@
 					}
 				],
 				"url": {
-					"raw": "{{endpoint}}/tools/oauth/attio",
+					"raw": "{{endpoint}}/tools/oauth/hubspot",
 					"host": [
 						"{{endpoint}}"
 					],
 					"path": [
 						"tools",
 						"oauth",
-						"attio"
+						"hubspot"
 					]
 				}
 			},
@@ -43,7 +43,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\"code\":\"eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IjEifQ.eyJpYXQiOjE3NDA5MDAwODAsImV4cCI6MTc0MDkwMDM4MCwiYXVkIjoiaHR0cHM6Ly9hcHAuYXR0aW8uY29tIiwiaXNzIjoiaHR0cHM6Ly9hcHAuYXR0aW8uY29tIiwiZ3JhbnRpbmdfd29ya3NwYWNlX2lkIjoiZDE2YTE4NDQtNzVlZC00NTNhLWFjMmYtOGFjMmM5MzMyNjhmIiwiY2xpZW50X2lkIjoiMjE3NWJjZTQtNDc4NC00ZDAxLWEwY2MtZGEyY2M4NTQ4YjAxIiwiand0X2lkIjoiZmJkNTRlNGEtNjA3Ny00ODk0LWE2N2MtOWJiNDU4YTRmODg1Iiwic2NvcGVzIjpbInJlY29yZF9wZXJtaXNzaW9uOnJlYWQtd3JpdGUiLCJsaXN0X2VudHJ5OnJlYWQtd3JpdGUiLCJvYmplY3RfY29uZmlndXJhdGlvbjpyZWFkLXdyaXRlIl0sInN0YXRlIjoiIiwiZ3JhbnRpbmdfYWN0b3JfaWQiOiJiMjQwZmI1Zi04NjRmLTRmYmYtODNmNS1mZjViMTdkNzY3MWUiLCJncmFudGluZ19hY3Rvcl90eXBlIjoid29ya3NwYWNlLW1lbWJlciJ9.uM1DBdnJcTo-1Gm0Im0bMsqHJxJAeQJrQxqdTtRL3l3OFl7TQhF8evu2ItbixNGjhQgaAJ017fpW2sBFiADNVA\",\"name\":\"attio\"}",
+					"raw": "{\"code\":\"na1-30d0-63a9-440f-8b85-9fe564c6628a\",\"name\":\"hubspot\"}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -182,13 +182,23 @@
 					}
 				},
 				"url": {
-					"raw": "{{endpoint}}/endpoints/read_contacts",
+					"raw": "{{endpoint}}/endpoints/read_contacts?passthrough=false&manual_tool=hubspot",
 					"host": [
 						"{{endpoint}}"
 					],
 					"path": [
 						"endpoints",
 						"read_contacts"
+					],
+					"query": [
+						{
+							"key": "passthrough",
+							"value": "false"
+						},
+						{
+							"key": "manual_tool",
+							"value": "hubspot"
+						}
 					]
 				}
 			},
@@ -221,6 +231,59 @@
 					],
 					"path": [
 						"mappings"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Webhooks",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "x-owner-id",
+						"value": "{{x-org-id}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{endpoint}}/tools/attio/webhooks",
+					"host": [
+						"{{endpoint}}"
+					],
+					"path": [
+						"tools",
+						"attio",
+						"webhooks"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Upsert Webhook",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"id\": \"<webhook-id>\",\r\n    \"secret\": \"\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{endpoint}}/tools/attio/webhooks",
+					"host": [
+						"{{endpoint}}"
+					],
+					"path": [
+						"tools",
+						"attio",
+						"webhooks"
 					]
 				}
 			},

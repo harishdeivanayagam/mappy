@@ -11,6 +11,7 @@ tools:
         - object_configuration:read
         - record_permission:read-write
 
+
   - name: hubspot
     auth: oauth2
     auth_info:
@@ -23,3 +24,5 @@ tools:
       scopes:
         - crm.objects.contacts.read
         - crm.objects.contacts.write
+
+

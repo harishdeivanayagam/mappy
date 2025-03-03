@@ -65,5 +65,3 @@ endpoints:
           "required": ["id", "name"]
         }
       }
-
-

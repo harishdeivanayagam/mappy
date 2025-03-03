@@ -21,3 +21,13 @@ model Tool {
   refreshToken    String?
   secretExpiresAt DateTime?
 }
+
+model Webhook {
+  toolName  String
+  ownerId   String
+  event     String
+  webhookId String?
+  secret    String?
+
+  @@id([toolName, ownerId, event])
+}
