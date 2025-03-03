@@ -2,21 +2,13 @@ import { Router } from "express"
 import { validateRequest } from "zod-express-middleware"
 import { z } from "zod"
 import { prisma } from "./prisma"
-import yaml from "js-yaml"
-import fs from "fs"
 import axios from "axios"
 import { Tool } from "@prisma/client"
 import { generateMappings, mapData } from "./mapper"
 import { validate } from "jsonschema"
+import { readYamlFile } from "./yaml"
 
 const router = Router()
-
-// Helper to read YAML files
-const readYamlFile = (filename: string) => {
-    const fileContents = fs.readFileSync(filename, "utf8")
-    return yaml.load(fileContents) as any
-}
-
 
 router.post(
     "/mappings",
@@ -178,7 +170,7 @@ router.post(
 
             const params = new URLSearchParams({
                 client_id: tool["auth_info"]["client_id"],
-                client_secret: tool["auth_info"]["client_secret"],
+                client_secret: eval(tool["auth_info"]["client_secret"]),
                 grant_type: "authorization_code",
                 code,
                 redirect_uri: tool["auth_info"]["redirect_uri"]
@@ -191,6 +183,8 @@ router.post(
             })
 
             const accessToken = response.data.access_token
+            const refreshToken = response.data.refresh_token || null
+            const expiresIn = response.data.expires_in || null
 
             const existingTool = await prisma.tool.findFirst({
                 where: {
@@ -202,11 +196,22 @@ router.post(
             if (existingTool) {
                 await prisma.tool.update({
                     where: { id: existingTool.id },
-                    data: { secret: accessToken }
+                    data: {
+                        secret: accessToken,
+                        refreshToken: refreshToken,
+                        secretExpiresAt: expiresIn
+                    }
                 })
             } else {
                 await prisma.tool.create({
-                    data: { name: name, secret: accessToken, authType: "OAUTH2", ownerId: res.locals.ownerId }
+                    data: {
+                        name: name,
+                        secret: accessToken,
+                        authType: "OAUTH2",
+                        ownerId: res.locals.ownerId,
+                        refreshToken: refreshToken,
+                        secretExpiresAt: expiresIn ? new Date(new Date().getTime() + expiresIn * 1000) : null
+                    }
                 })
             }
 
@@ -299,7 +304,8 @@ router.post(
     "/endpoints/:name",
     async (req, res) => {
         try {
-            const { passthrough } = req.query
+            const { passthrough, manual_tool } = req.query
+
             const { name } = req.params
             const endpointsFile = readYamlFile("endpoints.yml")
             const endpoint = endpointsFile.endpoints.find((endpoint: any) => endpoint.name === name)
@@ -318,15 +324,24 @@ router.post(
 
             let tool: Tool | null = null
 
-            for (const toolName of availableTools) {
+            if (manual_tool && availableTools.includes(manual_tool)) {
                 tool = await prisma.tool.findFirst({
                     where: {
-                        name: toolName,
+                        name: manual_tool as string,
                         ownerId: res.locals.ownerId
                     }
                 })
-                if (tool) {
-                    break
+            } else {
+                for (const toolName of availableTools) {
+                    tool = await prisma.tool.findFirst({
+                        where: {
+                            name: toolName,
+                            ownerId: res.locals.ownerId
+                        }
+                    })
+                    if (tool) {
+                        break
+                    }
                 }
             }
 
@@ -336,13 +351,16 @@ router.post(
             }
 
             // Find the tool in the endpoint <-> tool mapping [Ex: Hubspot -> User Hubspot]
-            const endpointTool = endpoint.tools.find((tool: any) => tool.name === tool.name)
+            const endpointTool = endpoint.tools.find((et: any) => et.name === tool.name)
+            console.log(endpointTool)
 
             // Set Token in headers
             const headersJSON = JSON.parse(endpointTool.headers.replace("{{ secret }}", tool.secret))
+            console.log(headersJSON)
 
             // Map the body to the endpoint tool body
             const bodyJSON = endpointTool.body ? await mapData(req.body, endpointTool.body) : {}
+            console.log(bodyJSON)
 
             // Map the query params to the endpoint tool query params
             const queryParamsJSON = endpointTool.query_params ? await mapData(req.body, endpointTool.query_params) : {}

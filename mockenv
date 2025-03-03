@@ -1,3 +1,5 @@
 PORT=[number]
 OPENAI_API_KEY=[string]
 DATABASE_URL=[string]
+HUBSPOT_CLIENT_SECRET=[string]
+ATTIO_CLIENT_SECRET=[string]

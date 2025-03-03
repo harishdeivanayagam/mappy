@@ -5,7 +5,7 @@ tools:
       auth_url: https://app.attio.com/authorize
       token_url: https://app.attio.com/oauth/token
       client_id: 2175bce4-4784-4d01-a0cc-da2cc8548b01
-      client_secret: 8969bb9ed8f54c932c11e996213baa4fbce1f1427bf8a68840fbdf740b11ca43
+      client_secret: process.env.ATTIO_CLIENT_SECRET
       redirect_uri: http://localhost:3005/tools/oauth/attio/callback
       scopes:
         - object_configuration:read
@@ -17,7 +17,7 @@ tools:
       auth_url: https://app.hubspot.com/oauth/authorize
       token_url: https://api.hubapi.com/oauth/v1/token
       client_id: c1095c9a-7e02-440c-adea-4fbc300be8b9
-      client_secret: be356b7b-11c7-48e0-8e85-8f2e15d1964e
+      client_secret: process.env.HUBSPOT_CLIENT_SECRET
       redirect_uri: http://localhost:3005/tools/oauth/hubspot/callback
       app_id: 8803742
       scopes:

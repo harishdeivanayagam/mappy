@@ -13,9 +13,11 @@ enum ToolAuthType {
 }
 
 model Tool {
-  id       String       @id @default(uuid())
-  name     String
-  authType ToolAuthType
-  ownerId  String
-  secret   String
+  id              String       @id @default(uuid())
+  name            String
+  authType        ToolAuthType
+  ownerId         String
+  secret          String
+  refreshToken    String?
+  secretExpiresAt DateTime?
 }
