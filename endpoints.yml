@@ -24,14 +24,13 @@ endpoints:
           }
         body: |
           {
-            "type": "object", 
-            "properties": {
-              "limit": {
-                "type": "number",
-                "description": "The number of contacts to read"
-              }
-            },
-            "required": ["limit"]
+              "limit": limit
+          }
+
+        output_json_format: |
+          data[].{
+            "id": id.record_id,
+            "name": $string(values.name[0].full_name) ? values.name[0].full_name : null
           }
 
       # Read contacts from Hubspot
@@ -44,30 +43,27 @@ endpoints:
           }
         query_params: |
           {
-            "type": "object",
-            "properties": {
-              "limit": {
-                "type": "number",
-                "description": "The number of contacts to read"
-              }
-            },
-            "required": ["limit"]
+            "limit": limit
           }
+        output_json_format: |
+          results.({
+              "id": id, 
+              "name": properties.firstname & ' ' & properties.lastname
+          })
 
-    output_json_format: |
+
+    # For final validation and reference
+    output_schema: |
       {
         "type": "array",
         "items": {
           "type": "object",
           "properties": {
-            "id": {
-              "type": "string",
-              "description": "The ID of the contact"
-            },
-            "name": {
-              "type": "string",
-              "description": "The name of the contact"
-            }
-          }
+            "id": { "type": "string", "description": "The ID of the contact" },
+            "name": { "type": "string", "description": "The name of the contact" }
+          },
+          "required": ["id", "name"]
         }
       }
+
+

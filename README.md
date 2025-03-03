@@ -5,9 +5,10 @@ Mappy is an intelligent unified API generator that simplifies the process of bui
 ## 🌟 Features
 
 - **Unified API Interface**: Write once, integrate with multiple platforms
-- **AI-Powered ETL**: Automatic mapping and transformation of data between different platforms
+- **AI-Powered ETL**: Automatic mapping and transformation of data between different platforms (Using API `/mappings` endpoint)
 - **Simple Configuration**: Easy to set up new integrations using YAML configuration
 - **OAuth2 Support**: Secure authentication with various platforms
+- **Webhook Support**: Receive and process webhooks from platforms (Coming Soon)
 - **Extensible**: Easy to add new integrations and endpoints
 
 ## 🚀 Prebuilt Platforms

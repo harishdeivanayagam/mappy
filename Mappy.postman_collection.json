@@ -160,6 +160,71 @@
 				}
 			},
 			"response": []
+		},
+		{
+			"name": "Make Query",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "x-owner-id",
+						"value": "{{x-org-id}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"limit\": 10\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{endpoint}}/endpoints/read_contacts",
+					"host": [
+						"{{endpoint}}"
+					],
+					"path": [
+						"endpoints",
+						"read_contacts"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Generate Mappings",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "x-owner-id",
+						"value": "{{x-org-id}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"inputData\": {\r\n        \"paging\": {\r\n            \"next\": {\r\n                \"link\": \"?after=NTI1Cg%3D%3D\",\r\n                \"after\": \"NTI1Cg%3D%3D\"\r\n            }\r\n        },\r\n        \"results\": [\r\n            {\r\n                \"associations\": {\r\n                    \"companies\": {\r\n                        \"results\": [\r\n                            {\r\n                                \"id\": \"29846388244\",\r\n                                \"type\": \"contact_to_company\"\r\n                            },\r\n                            {\r\n                                \"id\": \"29846388244\",\r\n                                \"type\": \"contact_to_company_unlabeled\"\r\n                            }\r\n                        ]\r\n                    }\r\n                },\r\n                \"createdAt\": \"2025-03-02T07:43:27.950Z\",\r\n                \"archived\": true,\r\n                \"archivedAt\": \"2025-03-02T07:43:27.950Z\",\r\n                \"propertiesWithHistory\": {\r\n                    \"lastname\": [\r\n                        {\r\n                            \"value\": \"Scout\",\r\n                            \"sourceId\": \"userId:2931299\",\r\n                            \"timestamp\": \"2025-02-11T16:28:13.591Z\",\r\n                            \"sourceType\": \"CRM_UI\",\r\n                            \"updatedByUserId\": 2931299\r\n                        },\r\n                        {\r\n                            \"value\": \"S.\",\r\n                            \"sourceId\": \"userId:2931299\",\r\n                            \"timestamp\": \"2025-02-11T15:45:00.400Z\",\r\n                            \"sourceType\": \"CRM_UI\",\r\n                            \"updatedByUserId\": 2931299\r\n                        }\r\n                    ]\r\n                },\r\n                \"id\": \"string\",\r\n                \"properties\": {\r\n                    \"email\": \"mark.s@lumon.industries\",\r\n                    \"lastname\": \"S.\",\r\n                    \"firstname\": \"Mark\",\r\n                    \"createdate\": \"2025-02-11T15:45:00.400Z\",\r\n                    \"hs_object_id\": \"98630638716\",\r\n                    \"lastmodifieddate\": \"2025-02-11T15:52:10.273Z\"\r\n                },\r\n                \"updatedAt\": \"2025-03-02T07:43:27.950Z\"\r\n            }\r\n        ]\r\n    },\r\n    \"outputSchema\": {\r\n        \"type\": \"array\",\r\n        \"items\": {\r\n            \"type\": \"object\",\r\n            \"properties\": {\r\n                \"id\": {\r\n                    \"type\": \"string\",\r\n                    \"description\": \"The ID of the contact\"\r\n                },\r\n                \"name\": {\r\n                    \"type\": \"string\",\r\n                    \"description\": \"The name of the contact\"\r\n                }\r\n            },\r\n            \"required\": [\r\n                \"id\",\r\n                \"name\"\r\n            ]\r\n        }\r\n    }\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{endpoint}}/mappings",
+					"host": [
+						"{{endpoint}}"
+					],
+					"path": [
+						"mappings"
+					]
+				}
+			},
+			"response": []
 		}
 	],
 	"auth": {

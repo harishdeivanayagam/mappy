@@ -19,12 +19,3 @@ model Tool {
   ownerId  String
   secret   String
 }
-
-model MapCache {
-  id           String   @id @default(uuid())
-  inputSchema  String
-  targetSchema String
-  mapper       String
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
-}

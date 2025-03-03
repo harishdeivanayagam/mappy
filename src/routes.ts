@@ -6,7 +6,7 @@ import yaml from "js-yaml"
 import fs from "fs"
 import axios from "axios"
 import { Tool } from "@prisma/client"
-import { autoMap } from "./mapper"
+import { generateMappings, mapData } from "./mapper"
 import { validate } from "jsonschema"
 
 const router = Router()
@@ -16,6 +16,29 @@ const readYamlFile = (filename: string) => {
     const fileContents = fs.readFileSync(filename, "utf8")
     return yaml.load(fileContents) as any
 }
+
+
+router.post(
+    "/mappings",
+    validateRequest({
+        body: z.object({
+            inputData: z.any(),
+            outputSchema: z.any()
+        })
+    }),
+    async (req, res) => {
+        try {
+            const { inputData, outputSchema } = req.body
+            const mappings = await generateMappings(inputData, outputSchema)
+            res.json(mappings)
+            return
+        } catch (err) {
+            res.status(500).json({ error: "Failed to generate mappings" })
+            return
+        }
+    }
+
+)
 
 router.get(
     "/tools",
@@ -276,6 +299,7 @@ router.post(
     "/endpoints/:name",
     async (req, res) => {
         try {
+            const { passthrough } = req.query
             const { name } = req.params
             const endpointsFile = readYamlFile("endpoints.yml")
             const endpoint = endpointsFile.endpoints.find((endpoint: any) => endpoint.name === name)
@@ -284,7 +308,6 @@ router.post(
                 res.status(404).json({ error: "Endpoint not found" })
                 return
             }
-
 
             if (endpoint.input_json_format && !validate(req.body, JSON.parse(endpoint.input_json_format)).valid) {
                 res.status(400).json({ error: "Invalid input data" })
@@ -319,14 +342,10 @@ router.post(
             const headersJSON = JSON.parse(endpointTool.headers.replace("{{ secret }}", tool.secret))
 
             // Map the body to the endpoint tool body
-            const bodyJSON = endpointTool.body ? await autoMap(req.body, JSON.parse(endpointTool.body)) : {}
+            const bodyJSON = endpointTool.body ? await mapData(req.body, endpointTool.body) : {}
 
             // Map the query params to the endpoint tool query params
-            const queryParamsJSON = endpointTool.query_params ? await autoMap(req.body, JSON.parse(endpointTool.query_params)) : {}
-
-
-            console.log(bodyJSON)
-            console.log(queryParamsJSON)
+            const queryParamsJSON = endpointTool.query_params ? await mapData(req.body, endpointTool.query_params) : {}
 
             // Make the request
             const response = await axios({
@@ -337,8 +356,20 @@ router.post(
                 params: queryParamsJSON
             })
 
+            if (passthrough && passthrough === "true") {
+                res.json(response.data)
+                return
+            }
+
             // Map the response to the endpoint output format
-            const outputJSON = await autoMap(response.data, JSON.parse(endpoint.output_json_format))
+            const outputJSON = await mapData(response.data, endpointTool.output_json_format)
+
+            // Validate the output JSON
+            if (endpoint.output_schema && !validate(outputJSON, JSON.parse(endpoint.output_schema)).valid) {
+                res.status(500).json({ error: "Invalid output data returned from the endpoint" })
+                return
+            }
+
             res.json(outputJSON)
             return
         } catch (error) {
