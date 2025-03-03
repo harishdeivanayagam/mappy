@@ -24,7 +24,14 @@ endpoints:
           }
         body: |
           {
-            "limit": "number"
+            "type": "object", 
+            "properties": {
+              "limit": {
+                "type": "number",
+                "description": "The number of contacts to read"
+              }
+            },
+            "required": ["limit"]
           }
 
       # Read contacts from Hubspot
@@ -37,7 +44,14 @@ endpoints:
           }
         query_params: |
           {
-            "limit": "number"
+            "type": "object",
+            "properties": {
+              "limit": {
+                "type": "number",
+                "description": "The number of contacts to read"
+              }
+            },
+            "required": ["limit"]
           }
 
     output_json_format: |

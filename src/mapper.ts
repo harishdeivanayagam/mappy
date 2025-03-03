@@ -25,51 +25,66 @@ export function computeSchema(inputData: any) {
     return inferSchema(inputData)
 }
 
-export function mapData(inputData: any, mappingTemplate: any) {
-    function applyMapping(data: any, template: any): any {
-        // Handle array mapping
-        if (template.type === 'array' && Array.isArray(data)) {
-            return data.map(item => applyMapping(item, template.items))
-        }
+export function mapData(inputData: any, mappingTemplate: any): any {
+    // Helper function to get value from path (e.g., "input.data.title")
+    function getValueFromPath(data: any, path: string): any {
+        if (path === "input") return data
+        const parts = path.split('.')
+        if (parts[0] !== "input") return path // If not a path, return as is
         
-        // Handle object mapping
-        if (template.type === 'object' && typeof data === 'object' && data !== null) {
-            const result = {}
-            for (const key in template.properties) {
-                const sourceKey = template.properties[key].source || key
-                const sourceValue = data[sourceKey]
-                
-                if (sourceValue !== undefined) {
-                    result[key] = applyMapping(sourceValue, template.properties[key])
-                } else if (template.properties[key].default !== undefined) {
-                    result[key] = template.properties[key].default
-                }
-            }
-            return result
+        let current = data
+        for (let i = 1; i < parts.length; i++) {
+            if (current === undefined || current === null) return undefined
+            current = current[parts[i]]
         }
-        
-        // Handle primitive types
-        if (template.transform) {
-            switch (template.transform) {
-                case 'toString':
-                    return String(data)
-                case 'toNumber':
-                    return Number(data)
-                case 'toBoolean':
-                    return Boolean(data)
-                default:
-                    return data
-            }
-        }
-        
-        return data
+        return current
     }
 
-    try {
-        return applyMapping(inputData, mappingTemplate)
-    } catch (error) {
-        throw new Error(`Error mapping data: ${error.message}`)
+    // Main mapping function
+    function applyMapping(data: any, template: any): any {
+        // Handle primitive types
+        if (typeof template !== 'object' || template === null) {
+            return template
+        }
+
+        // Handle arrays
+        if (Array.isArray(template)) {
+            return template.map(item => applyMapping(data, item))
+        }
+
+        // Handle template reference
+        if (template.template) {
+            return getValueFromPath(data, template.template)
+        }
+
+        // Handle objects
+        const result: any = {}
+        for (const key in template) {
+            if (key === 'type' || key === 'required') continue
+            
+            if (key === 'items' && template.type === 'array') {
+                // Handle array mapping
+                const sourceData = template.template ? 
+                    getValueFromPath(data, template.template) : 
+                    data
+                
+                if (Array.isArray(sourceData)) {
+                    return sourceData.map(item => applyMapping(item, template.items))
+                }
+                return []
+            } else if (key === 'properties') {
+                // Handle nested object properties
+                for (const propKey in template.properties) {
+                    result[propKey] = applyMapping(data, template.properties[propKey])
+                }
+            } else {
+                result[key] = applyMapping(data, template[key])
+            }
+        }
+        return result
     }
+
+    return applyMapping(inputData, mappingTemplate)
 }
 
 export async function autoMap(inputData: any, targetSchema: any, useCache: boolean = true) {
@@ -106,6 +121,79 @@ export async function autoMap(inputData: any, targetSchema: any, useCache: boole
             {
                 role: "user",
                 content: `
+                    For Input Schema, Output Schema Give the JSON Template
+                    Example:
+                    ---
+                    Input Schema
+                    {
+                        type: "array"
+                        items: {
+                            type: "object"
+                            properties: {
+                                title: "string",
+                                description: "name of the person"
+                            }
+                        }
+                    }
+
+                    Output Schema
+                    {
+                        type: "object"
+                        properties: {
+
+                            data: {
+                            type: "array"
+                                items: {
+                                    type: "object"
+                                    properties: {
+                                        name: "string",
+                                        description: "the name of person"
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    JSON Template
+                    {
+                        type: "object"
+                        properties: {
+
+                            data: {
+                                type: "array"
+                                items: {
+                                type: "object"
+                                template: "input" 
+                                properties: {
+                                        name: "string",
+                                        template: "input.title"
+                                        description: "the name of person"
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+
+                    If the input and output schemas are reversed (Based on target schema)
+
+                    {
+                        type: "array"
+                        items: {
+                            type: "object"
+                            template: "input.data"
+                            properties: {
+                                title: "string",
+                                template: "input.name"
+                                description: "name of the person"
+                            }
+                        }
+                    }
+                `
+            },
+            {
+                role: "user",
+                content: `
                 From the input, extract the data and map it to the output format
                 Input Schema: ${JSON.stringify(inputData)}
                 Output Schema: ${JSON.stringify(targetSchema)}
@@ -119,7 +207,7 @@ export async function autoMap(inputData: any, targetSchema: any, useCache: boole
     const output = JSON.parse(response.choices[0].message.content || "{}")
 
     console.log(output)
-    
+
     await prisma.mapCache.create({
         data: {
             inputSchema: JSON.stringify(inputSchema),
@@ -127,6 +215,6 @@ export async function autoMap(inputData: any, targetSchema: any, useCache: boole
             mapper: JSON.stringify(output)
         }
     })
-    
+
     return mapData(inputData, output)
 }
