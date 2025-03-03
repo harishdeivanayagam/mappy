@@ -7,6 +7,7 @@ import { Tool } from "@prisma/client"
 import { generateMappings, mapData } from "./mapper"
 import { validate } from "jsonschema"
 import { readYamlFile } from "./yaml"
+import { getAccessToken } from "./token"
 
 const router = Router()
 
@@ -354,8 +355,10 @@ router.post(
             const endpointTool = endpoint.tools.find((et: any) => et.name === tool.name)
             console.log(endpointTool)
 
+            const toolSecret = await getAccessToken(tool.name, res.locals.ownerId)
+
             // Set Token in headers
-            const headersJSON = JSON.parse(endpointTool.headers.replace("{{ secret }}", tool.secret))
+            const headersJSON = JSON.parse(endpointTool.headers.replace("{{ secret }}", toolSecret))
             console.log(headersJSON)
 
             // Map the body to the endpoint tool body

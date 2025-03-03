@@ -19,14 +19,21 @@ export const getAccessToken = async (toolName: string, ownerId: string) => {
 
 
     if (tool.refreshToken && tool.secretExpiresAt && tool.secretExpiresAt < new Date()) {
+
+        const data = new URLSearchParams({
+            grant_type: "refresh_token",
+            refresh_token: tool.refreshToken,
+            client_id: toolData.auth_info.client_id,
+            client_secret: eval(toolData.auth_info.client_secret)
+        })
+
+        
         const response = await axios({
             method: "POST",
             url: toolData.auth_info.token_url,
-            data: {
-                grant_type: "refresh_token",
-                refresh_token: tool.refreshToken,
-                client_id: toolData.auth_info.client_id,
-                client_secret: toolData.auth_info.client_secret
+            data: data.toString(),
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded"
             }
         })
 
